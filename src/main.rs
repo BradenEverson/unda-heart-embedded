@@ -39,9 +39,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     //Collect params from IO and generate inferences!
     loop {
         let in_val = adc.read(&mut pulse_sensor)?;
-        //let voltage = (in_val as f32) * (3.3 / 4095f32);
-
-        //log::info!("{}", voltage);
 
         if in_val > threshold && !beat_detected {
             beat_detected = true;
