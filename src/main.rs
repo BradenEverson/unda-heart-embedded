@@ -1,7 +1,7 @@
 use std::{error::Error, time::Instant};
 
-use esp_idf_svc::hal::{adc::{self, attenuation::{self, DB_11}, config::Config, AdcChannelDriver, AdcDriver}, delay::FreeRtos, gpio::{ADCPin, Level, PinDriver}, peripherals::Peripherals};
-use esp_idf_unda::network::{input::Input, network::Network};
+use esp_idf_svc::hal::{adc::{attenuation, config::Config, AdcChannelDriver, AdcDriver}, delay::FreeRtos, gpio::{Level, PinDriver}, peripherals::Peripherals};
+use esp_idf_unda::network::{activations::Activations, network::Network};
 
 fn main() -> Result<(), Box<dyn Error>> {
     // It is necessary to call this function once. Otherwise some patches to the runtime
@@ -27,12 +27,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let age = 19f32;
     let sex = 0f32;
 
-    let mut model = Network::deserialize_unda_fmt_string(model_str.into()); 
+    let mut model = Network::deserialize_unda_fmt_string(model_str.into(), Activations::SIGMOID); 
 
     let threshold = 3000;
     let mut beat_detected = false;
     let mut last_beat_time = Instant::now();
-    let mut bpm = 0f32;
+    let mut bpm;
     let mut led_state = Level::Low;
 
 
@@ -50,7 +50,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             last_beat_time = curr_time;
 
             if beat_interval.as_secs_f32() > 0.0 {
-                bpm = (60.0 / beat_interval.as_secs_f32());
+                bpm = 60.0 / beat_interval.as_secs_f32();
                 if bpm < 220f32 {
                     log::info!("BPM: {}", bpm);
                     
